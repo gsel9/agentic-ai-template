@@ -60,7 +60,7 @@ def run_rag(
     index_name = os.getenv("INDEX_NAME")
     #search_key = os.getenv("SEARCH_KEY")
     #open_ai_key = os.getenv("OPEN_AI_KEY")
-    embedding_model = os.getenv("EMBEDDING_MODEL")
+    embedding_model = os.getenv("EMBEDDING_MODEL")  
     #search_endpoint = os.getenv("SEARCH_ENDPOINT")
     #open_ai_endpoint = os.getenv("OPEN_AI_ENDPOINT")
     return {"chat_model": chat_model, "index_name": index_name, "embedding_model": embedding_model}
