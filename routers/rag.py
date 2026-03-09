@@ -28,7 +28,6 @@ def ask_api(query: Query) -> Dict[str, Any]:
         answer = run_rag(
             query.item_id, query.user_id, query.conv_id, query.user_input
         )
-        answer = "This is the answer!!!"
         return {"answer": answer}
     except Exception as exc:
         # log.exception("ask_api failed")  # add logging as needed
