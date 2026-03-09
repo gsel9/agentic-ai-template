@@ -35,9 +35,9 @@ log = logging.getLogger("main")
 
 
 # Reads env variables from Azure Functions portal
-#client = CosmosClient(os.getenv("COSMOS_ENDPOINT"), os.getenv("COSMOS_KEY"))
-#database = client.get_database_client(os.getenv("CONTAINER"))
-#container = database.get_container_client(os.getenv("DATABASE"))
+client = CosmosClient(os.getenv("COSMOS_ENDPOINT"), os.getenv("COSMOS_KEY"))
+database = client.get_database_client(os.getenv("CONTAINER"))
+container = database.get_container_client(os.getenv("DATABASE"))
 
 
 def is_new_user(user_id: str) -> bool:
@@ -49,13 +49,9 @@ def is_new_user(user_id: str) -> bool:
         FROM c
         WHERE c.userID = @userID
     """
-    params = [
-        {"name": "@userID", "value": user_id}
-    ]
-    
     match_user_id = list(container.query_items(
         query=query,
-        parameters=params,
+        parameters=[{"name": "@userID", "value": user_id}],
         enable_cross_partition_query=True
     ))
 

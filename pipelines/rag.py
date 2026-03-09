@@ -15,15 +15,15 @@ from typing import List, Dict
 import logging
 import os 
 
-#from utils.history_db import is_new_user, schema, create_item, get_prior_messages, append_to_history
-#from utils.chat_client import create_chat_client, chat_instructions
-#from utils.rag_client import (
-#    run_vector_search, 
-#    create_search_client, 
-#    create_embedding_client,
-#    create_context_message
-#)
-#from utils.chat_turn import chat_turn
+from utils.history_db import is_new_user, schema, create_item, get_prior_messages, append_to_history
+from utils.chat_client import create_chat_client, chat_instructions
+from utils.rag_client import (
+    run_vector_search, 
+    create_search_client, 
+    create_embedding_client,
+    create_context_message
+)
+from utils.chat_turn import chat_turn
 
 logging.basicConfig(
     level=logging.INFO,
@@ -42,29 +42,28 @@ def run_rag(
     """
     TODO
     """
-    #if is_new_user(user_id):
-    #    log.info("Initialize item for new user: %s", user_id)
-    #    create_item(schema(item_id, user_id, conv_id))
+    if is_new_user(user_id):
+        log.info("Initialize item for new user: %s", user_id)
+        create_item(schema(item_id, user_id, conv_id))
 
-    #    log.info("Starting a new conversation history")
-    #    messages = list(chat_instructions())
-    #else:
-    #    log.info("Getting existing conversation history")
-    #    messages = get_prior_messages(user_id, conv_id)[0]["messages"]
+        log.info("Starting a new conversation history")
+        messages = list(chat_instructions())
+    else:
+        log.info("Getting existing conversation history")
+        messages = get_prior_messages(user_id, conv_id)[0]["messages"]
 
-    #if len(messages) > use_k_last:
-    #    log.info("Truncating messages")
-    #    messages = _safe_trucate_messages(messages, use_k_last)
+    if len(messages) > use_k_last:
+        log.info("Truncating messages")
+        messages = _safe_trucate_messages(messages, use_k_last)
 
     chat_model = os.getenv("CHAT_MODEL")
+    open_ai_key = os.getenv("OPEN_AI_KEY")
     index_name = os.getenv("INDEX_NAME")
-    #search_key = os.getenv("SEARCH_KEY")
-    #open_ai_key = os.getenv("OPEN_AI_KEY")
+    search_key = os.getenv("SEARCH_KEY")
     embedding_model = os.getenv("EMBEDDING_MODEL")  
-    #search_endpoint = os.getenv("SEARCH_ENDPOINT")
-    #open_ai_endpoint = os.getenv("OPEN_AI_ENDPOINT")
-    return {"chat_model": chat_model, "index_name": index_name, "embedding_model": embedding_model}
-    """
+    search_endpoint = os.getenv("SEARCH_ENDPOINT")
+    open_ai_endpoint = os.getenv("OPEN_AI_ENDPOINT")
+    
     chat_client = create_chat_client(open_ai_endpoint, open_ai_key)
     embed_client = create_embedding_client(open_ai_endpoint, open_ai_key)
     search_client = create_search_client(search_endpoint, index_name, search_key)
@@ -91,8 +90,7 @@ def run_rag(
     append_to_history(item_id, user_id, conv_id, {"role": "system", "content": answer})
 
     return answer
-    """
-
+    
 
 def _safe_trucate_messages(history: List[Dict], use_k_last: int) -> List[Dict]:
     """
