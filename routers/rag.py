@@ -4,7 +4,7 @@ App router for RAG
 from typing import Dict, Any
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from workflows.rag import run_rag
+from pipelines.rag import run_rag
 
 router = APIRouter()
 
