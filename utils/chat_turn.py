@@ -4,7 +4,7 @@ Interactive CLI-driven chat loop.
 
 import logging
 from typing import Any, List, Tuple
-from chat_client import request_chat_response
+from utils.chat_client import request_chat_response
 
 log = logging.getLogger(__name__)
 
