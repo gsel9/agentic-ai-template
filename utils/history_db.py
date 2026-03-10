@@ -21,11 +21,13 @@ print(is_new_user("user-000"))
 print(get_prior_messages("user-000", "conv-000")[0]["messages"])
 """
 from typing import List, Dict, Any, Optional
-import os 
+import os
 import logging
-from datetime import datetime
 
 from azure.cosmos import CosmosClient
+from utils import config
+from dotenv import load_dotenv
+load_dotenv()
 
 logging.basicConfig(
     level=logging.INFO,
@@ -33,11 +35,13 @@ logging.basicConfig(
 )
 log = logging.getLogger("main")
 
-
 # Reads env variables from Azure Functions portal
-client = CosmosClient(os.getenv("COSMOS_ENDPOINT"), os.getenv("COSMOS_KEY"))
-database = client.get_database_client(os.getenv("CONTAINER"))
-container = database.get_container_client(os.getenv("DATABASE"))
+client = CosmosClient(
+    os.getenv(config.COSMOS_ENDPOINT),
+    os.getenv(config.COSMOS_KEY)
+)
+database = client.get_database_client(os.getenv(config.DATABASE))
+container = database.get_container_client(os.getenv(config.CONTAINER))
 
 
 def is_new_user(user_id: str) -> bool:
@@ -102,15 +106,12 @@ def get_prior_messages(user_id: str, conv_id: str) -> List[dict]:
         WHERE c.userID = @userID
         AND c.convID = @convID
     """
-
-    parameters = [
-        {"name": "@userID", "value": user_id},
-        {"name": "@convID", "value": conv_id}
-    ]
-
     response = container.query_items(
         query=query,
-        parameters=parameters,
+        parameters=[
+            {"name": "@userID", "value": user_id},
+            {"name": "@convID", "value": conv_id}
+        ],
         enable_cross_partition_query=True
     )
     return list(response)
