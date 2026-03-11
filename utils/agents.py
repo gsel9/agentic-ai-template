@@ -50,6 +50,11 @@ def create_weather_agent(
         #toolset=toolset
     )
     """
-    agent = project_client.agents.get(agent_id) #agent_id)
+    #agent = project_client.create_agent(
+    #    model="gpt-4o",
+    #    name="my-agent",
+    #    instructions="You are a helpful assistant."
+    #)
+    agent = project_client.agents.get("Agent926") #agent_id)
 
     return agent
