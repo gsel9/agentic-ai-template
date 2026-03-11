@@ -2,20 +2,19 @@
 Instantiate client objects.
 """
 from azure.identity import DefaultAzureCredential
-from azure.ai.agents import AgentsClient
 from azure.core.credentials import AzureKeyCredential
+from azure.ai.projects import AIProjectClient
 from azure.search.documents import SearchClient
 from openai import AzureOpenAI
 
 
-def create_agent_client(endpoint):
+def create_ai_project_client(endpoint):
     """
     Create and return an Azure AI AgentsClient.
     """
-    return AgentsClient(
+    return AIProjectClient(
         endpoint=endpoint,
-        credential=DefaultAzureCredential(),
-        verify=False
+        credential=DefaultAzureCredential()
     )
 
 
@@ -42,7 +41,9 @@ def create_search_client(search_endpoint, index_name, search_key):
     return search_client
 
 
-def create_embedding_client(openai_endpoint: str, openai_key: str) -> AzureOpenAI:
+def create_embedding_client(
+    openai_endpoint: str, openai_key: str
+) -> AzureOpenAI:
     """
     Create an Azure OpenAI client for embeddings.
     """

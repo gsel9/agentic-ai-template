@@ -35,6 +35,10 @@
 9. From code repo, pull to download the the actions workflow file 
 10. Push code to main/master to trigger the deployment process
 
+### Add Agent
+
+Create new Foundry resource (not AI hub). 
+
 **Security**
 Using API keys is an alternative to configuring IAM permissions for resources. E.g., the Storage accoutn would need to be configured with Storage Blob Data Contributor role to Azure AI Search. However, in case entra ID/Active Directory does not work, rely on API authentication and Key Vault.
 
