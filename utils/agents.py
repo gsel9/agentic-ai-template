@@ -50,6 +50,6 @@ def create_weather_agent(
         #toolset=toolset
     )
     """
-    agent = project_client.agents.get("Agent926") #agent_id)
+    agent = project_client.agents.get(agent_id) #agent_id)
 
     return agent
