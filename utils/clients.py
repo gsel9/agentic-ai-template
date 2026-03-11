@@ -1,9 +1,22 @@
 """
 Instantiate client objects.
 """
+from azure.identity import DefaultAzureCredential
+from azure.ai.agents import AgentsClient
 from azure.core.credentials import AzureKeyCredential
 from azure.search.documents import SearchClient
 from openai import AzureOpenAI
+
+
+def create_agent_client(endpoint):
+    """
+    Create and return an Azure AI AgentsClient.
+    """
+    return AgentsClient(
+        endpoint=endpoint,
+        credential=DefaultAzureCredential(),
+        verify=False
+    )
 
 
 def create_chat_client(endpoint, api_key):

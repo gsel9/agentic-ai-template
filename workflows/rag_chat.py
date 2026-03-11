@@ -44,7 +44,7 @@ logging.basicConfig(
 log = logging.getLogger("main")
 
 
-def run_rag(
+def rag_chat_turn(
     item_id: str,
     user_id: str,
     conv_id: str,

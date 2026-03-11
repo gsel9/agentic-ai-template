@@ -8,6 +8,7 @@ on:
   push:
     branches:
       - master
+      - add-agent
   workflow_dispatch:
 
 jobs:

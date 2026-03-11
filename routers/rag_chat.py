@@ -3,20 +3,10 @@ App router for RAG
 """
 from typing import Dict, Any
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
-from pipelines.rag import run_rag
+from workflows.rag_chat import rag_chat_turn
+from routers._datamodels import Query
 
 router = APIRouter()
-
-
-class Query(BaseModel):
-    """
-    Data model for user message and conversation history.
-    """
-    item_id: str
-    user_id: str
-    conv_id: str
-    user_input: str
 
 
 @router.post("/ask")
@@ -25,7 +15,7 @@ def ask_api(query: Query) -> Dict[str, Any]:
     Endpoint to execute chat loop.
     """
     try:
-        answer = run_rag(
+        answer = rag_chat_turn(
             query.item_id, query.user_id, query.conv_id, query.user_input
         )
         return {"answer": answer}
