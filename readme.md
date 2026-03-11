@@ -48,19 +48,6 @@ To start the API after deployment, include in the startup bash script:
 # Parking lot
 
 
-- From AI Search > Settings > Keys, verify that API access is enabled
-- In Foundry, deploy an embedding model (eg, ada) and a chat model (eg, gtp-4o)
-- In storage account, create data container, one sub-directory with json data, and one directory with pdf data 
-- Cosmos: Data explorer, new container
-    - 
-
-
-- From storage accoutn, set IAM for AI Search:
-    - managed identity of your Azure AI Search service
-    - Storage Blob Data Contributor
-    - 
-- In Storage Account, create a data container with sub-directories for json and pdf data
-
 TODO: 
 - Programatically upload data to storage container
 - Deploy embedding model and chat model 
