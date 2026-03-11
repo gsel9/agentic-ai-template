@@ -21,9 +21,9 @@ async def lifespan(app: FastAPI):
     app.state.agent_client = create_agent_client(
         os.getenv(config.AGENT_ENDPOINT)
     )
-    app.state.weather_agent = create_weather_agent(
-        app.state.agent_client, os.getenv(config.WEATHER_AGENT_MODEL)
-    )
+    #app.state.weather_agent = create_weather_agent(
+    #    app.state.agent_client, os.getenv(config.WEATHER_AGENT_MODEL)
+    #)
     # Yield control to the app
     yield
 
