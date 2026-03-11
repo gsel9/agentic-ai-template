@@ -13,8 +13,7 @@ def get_weather(location: str) -> str:
 
 
 def create_weather_agent(
-    project_client: AIProjectClient,
-    agent_id: str
+    project_client: AIProjectClient, agent_id: str
 ):
     """
     Create and return the weather agent with a callable tool `recent_snowfall`.

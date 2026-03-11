@@ -1,8 +1,4 @@
 from typing import Any
-from utils.agents import create_weather_agent
-
-
-#agent = create_weather_agent(app.state.agent_client)
 
 
 def query_weather_agent(
@@ -26,7 +22,7 @@ def query_weather_agent(
     #    input=f"What is the current weather in {user_input}?",
     #)
     #return response.choices[0].message.content
-    return {"response": f"Queried weather agent with input: {user_input}"}
+    return {"response": f"Weather is great!!!!!!"}
 
 
 def main():

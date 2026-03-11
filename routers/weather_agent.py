@@ -9,18 +9,18 @@ from routers._datamodels import Query
 router = APIRouter()
 
 
-def get_ai_project_client(request: Request):
+def get_weather_agent(request: Request):
     """
     Dependency to get the agent client from app state.
     FastAPI injects a Request object when the function is used as a dependency.
     """
-    return request.app.state.ai_project_client
+    return request.app.state.weather_agent
 
 
 @router.post("/weather")
 def weather_api(
     query: Query,
-    project_client=Depends(get_ai_project_client)
+    weather_agent=Depends(get_weather_agent)
 ) -> Dict[str, Any]:
     """
     Endpoint to execute weather agent.
@@ -36,7 +36,7 @@ def weather_api(
             query.user_id,
             query.conv_id,
             query.user_input,
-            project_client,  # pass down weather agent client from app.state
+            weather_agent,  # pass down weather agent client from app.state
         )
         return {"answer": answer}
     except Exception as exc:
