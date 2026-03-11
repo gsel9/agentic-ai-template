@@ -14,7 +14,7 @@ def get_weather_agent_client(request: Request):
     Dependency to get the agent client from app state.
     FastAPI injects a Request object when the function is used as a dependency.
     """
-    return request.app.state.weather_agent
+    return "weather_agent repr as str" #request.app.state.weather_agent
 
 
 @router.post("/weather")
