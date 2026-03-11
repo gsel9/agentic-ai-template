@@ -2,7 +2,7 @@
 Instantiate agent objects.
 """
 from typing import Set
-from azure.ai.projects import AIProjectClient
+#from azure.ai.projects import AIProjectClient AgentsOperations 
 from azure.ai.agents.models import FunctionTool, ToolSet
 from openai import project
 
@@ -13,7 +13,7 @@ def get_weather(location: str) -> str:
 
 
 def create_weather_agent(
-    project_client: AIProjectClient, agent_id: str
+    project_client, agent_id #: AIProjectClient, agent_id: str
 ):
     """
     Create and return the weather agent with a callable tool `recent_snowfall`.
@@ -50,6 +50,6 @@ def create_weather_agent(
         #toolset=toolset
     )
     """
-    agent = project_client.agents.get_agent(agent_id)
+    agent = project_client.agents.get("Agent926") #agent_id)
 
     return agent
