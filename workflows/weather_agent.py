@@ -1,6 +1,5 @@
 from typing import Any
 from utils.agents import create_weather_agent
-#from main import app
 
 
 #agent = create_weather_agent(app.state.agent_client)

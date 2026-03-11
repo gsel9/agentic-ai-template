@@ -3,7 +3,6 @@
 - https://github.com/microsoft/azure-genai-design-patterns/tree/main
 - https://microsoft.github.io/multi-agent-reference-architecture/docs/reference-architecture/Reference-Architecture.html
 
-
 ## Setup
 1. Create a resource group, Storage Account, AI Search, and a Foundry resource
 2. Go to Storage Account > Data Storage > Containers:
@@ -38,6 +37,8 @@
 ### Add Agent
 
 Create new Foundry resource (not AI hub). 
+
+**NOTE** Will throw SSL error unless user ... (corporate wall)
 
 **Security**
 Using API keys is an alternative to configuring IAM permissions for resources. E.g., the Storage accoutn would need to be configured with Storage Blob Data Contributor role to Azure AI Search. However, in case entra ID/Active Directory does not work, rely on API authentication and Key Vault.
