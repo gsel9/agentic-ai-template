@@ -22,7 +22,7 @@ def query_weather_agent(
     #    input=f"What is the current weather in {user_input}?",
     #)
     #return response.choices[0].message.content
-    return {"response": f"Weather is great!!!!!!"}
+    return {"response (weather_agent)": weather_agent}
 
 
 def main():

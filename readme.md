@@ -38,7 +38,28 @@
 
 Create new Foundry resource (not AI hub). 
 
-**NOTE** Will throw SSL error unless user ... (corporate wall)
+### Authorize App Services 
+
+Note: Added role Azure AI Developer to App Services (and also to Foundry resources and Foundry projects in desparation)
+
+To interact with Foundry agents
+
+* Fix: Enable Managed Identity on your App Service
+    - Go to your App Service in the Azure Portal
+    - On the left menu, open Identity
+    - Turn System-assigned identity → On
+    - Save
+    - Copy the Principal ID (you’ll need it in the next step
+* Fix: Grant your App Service access to the Azure AI Project
+    - Your App Service identity must be given RBAC permissions.
+    - Open your Azure AI Project in Azure AI Foundry (ai.azure.com)
+    - Go to Project Settings → Access Control (IAM)
+    - Click Add → Add role assignment
+    - Choose one of these roles:
+    - Azure AI Developer (for agents)
+    - Assign it to: your App Service's system-assigned managed identity
+
+Wait 1–2 minutes for permissions to propagate.
 
 **Security**
 Using API keys is an alternative to configuring IAM permissions for resources. E.g., the Storage accoutn would need to be configured with Storage Blob Data Contributor role to Azure AI Search. However, in case entra ID/Active Directory does not work, rely on API authentication and Key Vault.

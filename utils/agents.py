@@ -50,11 +50,16 @@ def create_weather_agent(
         #toolset=toolset
     )
     """
+    names = []
+    agents = project_client.agents.list()
+    for agent in agents:
+        names.append(agent.name)
+    return names
     #agent = project_client.create_agent(
     #    model="gpt-4o",
     #    name="my-agent",
     #    instructions="You are a helpful assistant."
     #)
-    agent = project_client.agents.get("Agent926") #agent_id)
+    #agent = project_client.agents.get("Agent926") #agent_id)
 
-    return agent
+    #return agent
