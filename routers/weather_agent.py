@@ -40,6 +40,8 @@ def weather_api(
     """
     agent = ai_client.agents.get_agent(os.getenv(config.WEATHER_AGENT_ID)) 
 
+    return {"agent": agent.to_dict()}
+
     thread = ai_client.agents.threads.create()
     print()
     print()
