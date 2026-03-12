@@ -38,7 +38,7 @@ def weather_api(
     """
     Endpoint to execute weather agent.
     """
-    agent = ai_client.agents.get_agent(os.getenv(config.WEATHER_AGENT_ID)) 
+    agent = ai_client.agents.get(os.getenv(config.WEATHER_AGENT_ID)) 
 
     return {"agent": agent.to_dict()}
 
