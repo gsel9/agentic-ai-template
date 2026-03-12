@@ -3,8 +3,10 @@ App router for timer agent.
 """
 from time import time
 from typing import Dict, Any
+from urllib import response
 from fastapi import APIRouter, Depends, HTTPException, Request
 from workflows.weather_agent import query_weather_agent
+from azure.ai.agents.models import ListSortOrder
 from routers._datamodels import Query
 import os 
 from utils import config
@@ -20,7 +22,7 @@ def get_weather_agent(request: Request):
     return request.app.state.weather_agent
 
 
-def get_client(request: Request):
+def get_ai_client(request: Request):
     """
     Dependency to get the agent client from app state.
     FastAPI injects a Request object when the function is used as a dependency.
@@ -31,54 +33,41 @@ def get_client(request: Request):
 @router.post("/weather")
 def weather_api(
     query: Query,
-    #weather_agent=Depends(get_weather_agent)
-    client=Depends(get_client)
-): # -> Dict[str, Any]:
+    ai_client=Depends(get_ai_client)
+):
     """
     Endpoint to execute weather agent.
+    """
+    agent = ai_client.agents.get_agent(os.getenv(config.WEATHER_AGENT_ID)) 
 
-    FastAPI will:
-        Call get_agent_client(request) automatically before calling weather_api
-        Inject the returned value into the agent_client parameter
-        Pass it to weather_api() just like a normal function argument
-    """    
-    thread = client.agents.threads.create()
-    thread_id = thread.id
-    # 2. Add a user message to the thread
-    client.agents.messages.create(
-        thread_id=thread_id,
+    thread = ai_client.agents.threads.create()
+    print()
+    print()
+    print()
+    print(f"Created thread, ID: {thread.id}")
+    print()
+    print()
+    print()
+
+    message = ai_client.agents.messages.create(
+        thread_id=thread.id,
         role="user",
-        content="Explain retrieval augmented generation."
+        content="Hi Agent926"
     )
-    # 3. Start a run using your existing Foundry agent
-    run = client.agents.runs.create(
-        thread_id=thread_id,
-        agent_id=os.getenv(config.WEATHER_AGENT_ID)
-    )
-    # 4. Poll until the run completes
-    while True:
-        status = client.agents.runs.retrieve(
-            thread_id=thread_id,
-            run_id=run.id
-        )
-        if status.status in ("completed", "failed", "cancelled"):
-            break
-        time.sleep(0.5)
-    
-    # 5. Retrieve the assistant’s output
-    messages = client.agents.messages.list(thread_id=thread_id)
 
-    assistant_messages = [
-        m for m in messages.data if m.role == "assistant"
-    ]
+    run = ai_client.agents.runs.create_and_process(
+        thread_id=thread.id,
+        agent_id=agent.id)
 
-    last_message = assistant_messages[-1]
+    if run.status == "failed":
+        response_text = f"Run failed: {run.last_error}"
+    else:
+        response_text = ""
+        messages = ai_client.agents.messages.list(thread_id=thread.id, order=ListSortOrder.ASCENDING)
 
-    response_text = ""
-    for block in last_message.content:
-        if block.type == "output_text":
-            response_text += block.text
-
+        for message in messages:
+            if message.text_messages:
+                response_text += f"{message.role}: {message.text_messages[-1].text.value}\n"
     return {"Assistant response": response_text}
 
     """
