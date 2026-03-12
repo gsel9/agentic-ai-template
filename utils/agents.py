@@ -6,6 +6,8 @@ from typing import Set
 from azure.ai.agents.models import FunctionTool, ToolSet
 from openai import project
 
+from azure.ai.projects.models import PromptAgentDefinition
+
 
 def get_weather(location: str) -> str:
     """Get the current weather for a location."""
@@ -51,16 +53,25 @@ def create_weather_agent(
     )
     """
     #agent = project_client.agents.get("Agent926") #agent_id)
-    agent = project_client.create_agent(
-        model="gpt-4o",
-        name="my-agent",
-        instructions="You are a helpful assistant."
+    #agent = project_client.create_agent(
+    #    model="gpt-4o",
+    #    name="my-agent",
+    #    instructions="You are a helpful assistant."
+    #)
+    
+    agent = project_client.agents.create_version(
+        agent_name="MyAgent",
+        definition=PromptAgentDefinition(
+            model="gpt-4o",
+            instructions="You are a helpful assistant that answers general questions.",
+        ),
     )
+    return agent.as_dict()
 
-    names = []
-    agents = project_client.agents.list()
-    for agent in agents:
-        names.append(agent.name)
-    return names
+    #names = []
+    #agents = project_client.agents.list()
+    #for agent in agents:
+    #    names.append(agent.name)
+    #return names
     
     #return agent
