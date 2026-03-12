@@ -17,13 +17,9 @@ def query_weather_agent(
     #else:
     #    thread = retrieve_thread_id(user_id)
 
-    #response = timer_agent.responses.create(
-    #    conversation=thread.id,
-    #    input=f"What is the current weather in {user_input}?",
-    #)
+    return weather_agent.run(user_input).text
     #return response.choices[0].message.content
-    return {"response (weather_agent)": weather_agent}
-
+    
 
 def main():
     with DefaultAzureCredential(
