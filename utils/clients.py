@@ -10,7 +10,7 @@ from openai import AzureOpenAI
 
 def create_ai_project_client(endpoint):
     """
-    Create and return an Azure AI AgentsClient.
+    Create and return an AI Project client.
     """
     return AIProjectClient(
         endpoint=endpoint,

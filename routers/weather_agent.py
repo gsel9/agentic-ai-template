@@ -1,15 +1,9 @@
 """
-App router for timer agent.
+App router for weather agent.
 """
-from time import time
-from typing import Dict, Any
-from urllib import response
 from fastapi import APIRouter, Depends, HTTPException, Request
-from workflows.weather_agent import query_weather_agent
-from azure.ai.agents.models import ListSortOrder
 from routers._datamodels import Query
-import os 
-from utils import config
+from workflows.weather_agent import query_weather_agent
 
 router = APIRouter()
 
@@ -22,28 +16,43 @@ def get_weather_agent(request: Request):
     return request.app.state.weather_agent
 
 
-def get_ai_client(request: Request):
+def get_aoai_client(request: Request):
     """
     Dependency to get the agent client from app state.
     FastAPI injects a Request object when the function is used as a dependency.
     """
-    return request.app.state.ai_project_client
-
-
-from azure.identity import DefaultAzureCredential
-from azure.ai.projects import AIProjectClient
-from azure.ai.projects.models import PromptAgentDefinition
+    return request.app.state.aoai_client
 
 
 @router.post("/weather")
 def weather_api(
     query: Query,
-    #ai_client=Depends(get_ai_client)
+    weather_agent=Depends(get_weather_agent),
+    aoai_client=Depends(get_aoai_client)
 ):
     """
     Endpoint to execute weather agent.
     """
-    # Initialize AI Project Client
+    # NOTE TEMP: Create new conversation each time -> should be tied to session/user ID
+    conversation = aoai_client.conversations.create()
+    #if new_user():
+    #    thread = client.threads.create()
+    #    store_thread_id(user_id, thread.id)
+    #else:
+    #    thread = retrieve_thread_id(user_id)
+
+    try:
+        answer = query_weather_agent(
+            query, conversation.id, aoai_client, weather_agent
+        )
+        return {"answer": answer}
+    except Exception as exc:
+        # log.exception("ask_api failed")  # add logging as needed
+        raise HTTPException(status_code=500, detail=str(exc))
+
+
+"""
+# Initialize AI Project Client
     project_client = AIProjectClient(
         endpoint=os.getenv(config.AI_PROJ_ENDPOINT),   # <-- base endpoint only
         credential=DefaultAzureCredential()
@@ -95,33 +104,4 @@ def weather_api(
 
     assistant_reply = response.output[0].content[0].text
     return {"answer": assistant_reply}
-
-    """
-    # Create a thread
-    thread = project.agents.create_thread()
-    # Send message
-    message = project.agents.create_message(
-        thread_id=thread.id,
-        role="user",
-        content="Hello agent!"
-    )
-    # Run agent
-    run = project.agents.create_run(
-        thread_id=thread.id,
-        agent_id="<agent-id>"
-    )
-    """
-    """
-    try:
-        answer = query_weather_agent(
-            query.item_id,
-            query.user_id,
-            query.conv_id,
-            query.user_input,
-            weather_agent,  # pass down weather agent client from app.state
-        )
-        return {"answer": answer}
-    except Exception as exc:
-        # log.exception("ask_api failed")  # add logging as needed
-        raise HTTPException(status_code=500, detail=str(exc))
-    """
+"""

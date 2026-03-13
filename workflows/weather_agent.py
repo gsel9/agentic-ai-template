@@ -2,85 +2,53 @@ from typing import Any
 
 
 def query_weather_agent(
-    item_id: str,
-    user_id: str,
-    conv_id: str,
-    user_input: str,
+    query: Any,
+    conversation_id: str,
+    aoai_client: Any,
     weather_agent: Any
-):
+) -> str:
     """
     Query the weather agent for the current weather in a given location.
     """
-    #if new_user():    
-    #    thread = client.threads.create()
-    #    store_thread_id(user_id, thread.id)
-    #else:
-    #    thread = retrieve_thread_id(user_id)
-
-    return weather_agent.run(user_input).text
-    #return response.choices[0].message.content
-    
-
-def main():
-    with DefaultAzureCredential(
-            exclude_environment_credential=True,
-            exclude_managed_identity_credential=True,
-        ) as credential, AIProjectClient(
-            endpoint=endpoint, credential=credential
-        ) as project_client, project_client.get_openai_client() as openai_client:
-
-            file_obj = openai_client.files.create(
-                file=open(file_path, "rb"),
-                purpose="assistants",
-            )
-
-            code_tool = build_code_interpreter_tool(file_obj.id)
-            func_tool = build_function_tool()
-
-            agent = create_agent(project_client, model_name, [code_tool, func_tool])
-            conversation = create_conversation(openai_client)
-
-            chat_loop(openai_client, agent, conversation.id)
-
-            cleanup(openai_client, conversation.id, project_client, agent)
-            conversation = None
-            agent = None
-
-
-def create_conversation(openai_client):
-    """Create a new conversation thread."""
-    conversation = openai_client.conversations.create()
-    log.info("Conversation created: %s", conversation.id)
-    return conversation
+    # Add user message
+    append_user_message(
+        aoai_client, conversation_id, query.user_input
+    )
+    # Request agent response
+    response = request_agent_response(
+        aoai_client, conversation_id, query.user_input, weather_agent
+    )
+    # Return response text
+    return response.output[0].content[0].text
 
 
 def append_user_message(
-    openai_client, conversation_id: str, text: str
+    aoai_client, conversation_id: str, text: str
 ) -> None:
     """Append a user message to an existing conversation."""
-    openai_client.conversations.items.create(
+    aoai_client.conversations.items.create(
         conversation_id=conversation_id,
         items=[{"type": "message", "role": "user", "content": text}],
     )
 
 
 def request_agent_response(
-    openai_client, conversation_id: str, agent
+    aoai_client, conversation_id: str, user_input: str, agent: Any
 ):
     """Request a response from the agent."""
-    return openai_client.responses.create(
+    return aoai_client.responses.create(
         conversation=conversation_id,
-        input="",
-        extra_body={"agent": {"name": agent.name, "type": "agent_reference"}},
+        input=[{
+            "role": "user",
+            "content": [{
+                "type": "input_text",
+                "text": user_input
+            }]
+        }],
+        extra_body={
+            "agent_reference": {
+                "type": "agent_reference",
+                "name": agent.name
+            }
+        }
     )
-
-
-def recent_snowfall(location: str) -> str:
-    """
-    Fetches recent snowfall totals for a given location.
-    :param location: The city name.
-    :return: Snowfall details as a JSON string.
-    """
-    mock_snow_data = {"Seattle": "0 inches", "Denver": "2 inches"}
-    snow = mock_snow_data.get(location, "Data not available.")
-    return json.dumps({"location": location, "snowfall": snow})
