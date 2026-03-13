@@ -30,48 +30,46 @@ def get_ai_client(request: Request):
     return request.app.state.ai_project_client
 
 
+from azure.identity import DefaultAzureCredential
+from azure.ai.projects import AIProjectClient
+from azure.ai.projects.models import PromptAgentDefinition
+
+
 @router.post("/weather")
 def weather_api(
     query: Query,
-    ai_client=Depends(get_ai_client)
+    #ai_client=Depends(get_ai_client)
 ):
     """
     Endpoint to execute weather agent.
     """
-    agent = ai_client.agents.get(os.getenv(config.WEATHER_AGENT_ID)) 
-
-    return {"agent": agent.to_dict()}
-
-    thread = ai_client.agents.threads.create()
-    print()
-    print()
-    print()
-    print(f"Created thread, ID: {thread.id}")
-    print()
-    print()
-    print()
-
-    message = ai_client.agents.messages.create(
-        thread_id=thread.id,
-        role="user",
-        content="Hi Agent926"
+    project_client = AIProjectClient(
+        endpoint=os.getenv(config.AI_PROJ_ENDPOINT), 
+        credential=DefaultAzureCredential()
     )
-
-    run = ai_client.agents.runs.create_and_process(
-        thread_id=thread.id,
-        agent_id=agent.id)
-
-    if run.status == "failed":
-        response_text = f"Run failed: {run.last_error}"
-    else:
-        response_text = ""
-        messages = ai_client.agents.messages.list(thread_id=thread.id, order=ListSortOrder.ASCENDING)
-
-        for message in messages:
-            if message.text_messages:
-                response_text += f"{message.role}: {message.text_messages[-1].text.value}\n"
-    return {"Assistant response": response_text}
-
+    # Get OpenAI client
+    openai_client = project_client.get_openai_client()
+    # Create agent
+    agent = project_client.agents.create_version(
+        agent_name="support-agent",
+        definition=PromptAgentDefinition(
+            model=os.getenv(config.CHAT_MODEL),
+            instructions="You are a helpful assistant."
+        ),
+    )
+    # Create conversation
+    conversation = openai_client.conversations.create()
+    # Add user message to conversation
+    openai_client.conversations.items.create(
+        conversation_id=conversation.id,
+        items=[{"type": "message", "role": "user", "content": query.user_input}],
+    )
+    # Get response
+    response = openai_client.responses.create(
+        conversation=conversation.id,
+        input="",
+        extra_body={"agent": {"name": agent.name, "type": "agent_reference"}},
+    )
     """
     try:
         answer = query_weather_agent(

@@ -24,6 +24,6 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI()#lifespan=lifespan)
 app.include_router(rag_chat.router)
 app.include_router(weather_agent.router)
