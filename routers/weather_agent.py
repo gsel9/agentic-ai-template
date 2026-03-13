@@ -43,13 +43,16 @@ def weather_api(
     """
     Endpoint to execute weather agent.
     """
+    # Initialize AI Project Client
     project_client = AIProjectClient(
-        endpoint=os.getenv(config.AI_PROJ_ENDPOINT), 
+        endpoint=os.getenv(config.AI_PROJ_ENDPOINT),
         credential=DefaultAzureCredential()
     )
+
     # Get OpenAI client
     openai_client = project_client.get_openai_client()
-    # Create agent
+
+    # --- Create or load agent ---
     agent = project_client.agents.create_version(
         agent_name="support-agent",
         definition=PromptAgentDefinition(
@@ -57,19 +60,57 @@ def weather_api(
             instructions="You are a helpful assistant."
         ),
     )
-    # Create conversation
+
+    # --- Create conversation ---
     conversation = openai_client.conversations.create()
-    # Add user message to conversation
+
+    # Add user message
     openai_client.conversations.items.create(
         conversation_id=conversation.id,
-        items=[{"type": "message", "role": "user", "content": query.user_input}],
+        items=[
+            {
+                "type": "message",
+                "role": "user",
+                "content": query.user_input
+            }
+        ],
     )
-    # Get response
+
+    # --- Request agent response ---
     response = openai_client.responses.create(
-        conversation=conversation.id,
-        input="",
-        extra_body={"agent": {"name": agent.name, "type": "agent_reference"}},
+        agent_reference={               # ✅ REQUIRED — replaces deprecated "agent"
+            "type": "agent_id",
+            "id": agent.id,
+        },
+        conversation=conversation.id,    # Link the response to the conversation
+        input=[                          # Matches new API schema
+            {
+                "role": "user",
+                "content": [
+                    {"type": "input_text", "text": query.user_input}
+                ]
+            }
+        ]
     )
+
+    # Response content is inside `output[0].content[0].text`
+    assistant_reply = response.output[0].content[0].text
+    return {"answer": assistant_reply}
+    """
+    # Create a thread
+    thread = project.agents.create_thread()
+    # Send message
+    message = project.agents.create_message(
+        thread_id=thread.id,
+        role="user",
+        content="Hello agent!"
+    )
+    # Run agent
+    run = project.agents.create_run(
+        thread_id=thread.id,
+        agent_id="<agent-id>"
+    )
+    """
     """
     try:
         answer = query_weather_agent(
