@@ -87,8 +87,8 @@ def weather_api(
         ],
         extra_body={
             "agent_reference": {
-                "type": "agent_id",
-                "id": agent.id,
+                "type": "agent_reference",
+                "name": agent.name
             }
         },
     )
