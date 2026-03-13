@@ -45,10 +45,9 @@ def weather_api(
     """
     # Initialize AI Project Client
     project_client = AIProjectClient(
-        endpoint=os.getenv(config.AI_PROJ_ENDPOINT),
+        endpoint=os.getenv(config.AI_PROJ_ENDPOINT),   # <-- base endpoint only
         credential=DefaultAzureCredential()
     )
-
     # Get OpenAI client
     openai_client = project_client.get_openai_client()
 
@@ -60,7 +59,6 @@ def weather_api(
             instructions="You are a helpful assistant."
         ),
     )
-
     # --- Create conversation ---
     conversation = openai_client.conversations.create()
 
@@ -78,24 +76,26 @@ def weather_api(
 
     # --- Request agent response ---
     response = openai_client.responses.create(
-        agent_reference={               # ✅ REQUIRED — replaces deprecated "agent"
-            "type": "agent_id",
-            "id": agent.id,
-        },
-        conversation=conversation.id,    # Link the response to the conversation
-        input=[                          # Matches new API schema
+        conversation=conversation.id,
+        input=[
             {
                 "role": "user",
                 "content": [
                     {"type": "input_text", "text": query.user_input}
-                ]
+                ],
             }
-        ]
+        ],
+        extra_body={
+            "agent_reference": {
+                "type": "agent_id",
+                "id": agent.id,
+            }
+        },
     )
 
-    # Response content is inside `output[0].content[0].text`
     assistant_reply = response.output[0].content[0].text
     return {"answer": assistant_reply}
+
     """
     # Create a thread
     thread = project.agents.create_thread()
